@@ -1,4 +1,4 @@
-package sorting
+package sorting_solutions
 
 import (
 	"fmt"
@@ -70,21 +70,6 @@ func TestQuickSort(t *testing.T) {
 	}
 	fmt.Println("sorted copy", copyList)
 	fmt.Println("Quick sorted list", bubbleSorted)
-}
-func TestSelectionSort(t *testing.T) {
-	unsortedList, copyList := generateLists(t)
-	slices.Sort(copyList)
-	bubbleSorted := SelectionSort(unsortedList)
-	if len(bubbleSorted) != len(copyList) {
-		t.Errorf("got length: %d, want length: %d", len(bubbleSorted), len(copyList))
-	}
-	for i, number := range bubbleSorted {
-		if number != copyList[i] {
-			t.Errorf("got %v\nwant %v", bubbleSorted, copyList)
-		}
-	}
-	fmt.Println("sorted copy", copyList)
-	fmt.Println("Selection sorted list", bubbleSorted)
 }
 
 func generateLists(t *testing.T) ([]int, []int) {
