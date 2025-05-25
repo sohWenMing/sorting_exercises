@@ -1,6 +1,8 @@
 package linkedlist
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -75,6 +77,131 @@ func TestGetNodeAtIndex(t *testing.T) {
 		t.Errorf("isFound should have returned true but returned false")
 	}
 	checkNodes(gotNode, nodes[4], t)
+}
+
+func TestGetNodeWithVal(t *testing.T) {
+	testLL := InitLinkedList()
+	nodes := addNotestoList(testLL, 5)
+	_, index, isFound := testLL.GetNodeWithVal(-1)
+	if isFound {
+		t.Errorf("isFound should have returned false, returned true \nnodes: %v", nodes)
+		return
+	}
+	if index != 0 {
+		t.Errorf("index should have returned 0, returned %d", index)
+		return
+	}
+
+	checkVals := []int{0, 3, 4}
+	for _, val := range checkVals {
+		node, index, isFound := testLL.GetNodeWithVal(val)
+		checkNodes(node, nodes[val], t)
+		if !isFound {
+			t.Errorf("search for node with val %d returned isFound == false\n nodes: %v", val, nodes)
+			return
+		}
+		if index != val {
+			t.Errorf("index was not correct for value searched %d\n nodes: %v", val, nodes)
+			return
+		}
+	}
+}
+
+func TestAddNodeGuardChecks(t *testing.T) {
+	// Index is a negative index
+	testLL := InitLinkedList()
+	addNotestoList(testLL, 5)
+	nodeToAdd := InitNode(-1)
+
+	err := testLL.AddNodeAtIndex(nodeToAdd, -1)
+	if err == nil {
+		t.Errorf("expected error, didn't get one")
+	}
+	err = testLL.AddNodeAtIndex(nodeToAdd, 6)
+	if err == nil {
+		t.Errorf("expected error, didn't get one")
+	}
+}
+
+func TestAddNodeAtHeadByIndex(t *testing.T) {
+	// Test 2: Adding to the first index of a list
+	testLL := InitLinkedList()
+	nodeToAdd1 := InitNode(-1)
+
+	err := testLL.AddNodeAtIndex(nodeToAdd1, 0)
+	if err != nil {
+		t.Errorf("didn't expect error, got %v", err)
+	}
+	gotHead := testLL.GetHead()
+	checkNodes(gotHead, nodeToAdd1, t)
+	gotTail := testLL.GetTail()
+	checkNodes(gotTail, nodeToAdd1, t)
+	checkLength(t, testLL, 1)
+
+	nodeToAdd2 := InitNode(-2)
+	err = testLL.AddNodeAtIndex(nodeToAdd2, 0)
+	if err != nil {
+		t.Errorf("didn't expect error, got %v", err)
+	}
+	gotHead = testLL.GetHead()
+	checkNodes(gotHead, nodeToAdd2, t)
+	gotTail = testLL.GetTail()
+	checkNodes(gotTail, nodeToAdd1, t)
+	checkLength(t, testLL, 2)
+}
+
+func TestAddNodeAtTailByIndex(t *testing.T) {
+
+	testLL := InitLinkedList()
+	addNotestoList(testLL, 5)
+	nodeToAdd := InitNode(-1)
+
+	err := testLL.AddNodeAtIndex(nodeToAdd, 5)
+	if err != nil {
+		t.Errorf("didn't expect error, got %v", err)
+	}
+	gotTail := testLL.GetTail()
+	checkNodes(gotTail, nodeToAdd, t)
+	checkLength(t, testLL, 6)
+}
+
+func TestAddNodeAtMiddleByIndex(t *testing.T) {
+	testLL := InitLinkedList()
+	addNotestoList(testLL, 5)
+	// curr state of list {0,1,2,3,4}
+	nodeToAdd := InitNode(-1)
+	err := testLL.AddNodeAtIndex(nodeToAdd, 2)
+	// expected state of list would be {0, 1, -1, 2, 3, 4}
+	if err != nil {
+		t.Errorf("didn't expect error, got %v", err)
+	}
+	gotNode, isFound := testLL.GetNodeAtIndex(2)
+	if !isFound {
+		t.Errorf("is found returned false should return true")
+		stringReps := testLL.GetStringReprs()
+		fmt.Println("Nodes: ")
+		for _, stringRep := range stringReps {
+			fmt.Println(stringRep)
+		}
+		return
+	}
+	err = checkNodes(gotNode, nodeToAdd, t)
+	if err != nil {
+		stringReps := testLL.GetStringReprs()
+		fmt.Println("Nodes: ")
+		for _, stringRep := range stringReps {
+			fmt.Println(stringRep)
+		}
+	}
+}
+
+func TestGetStringReprs(t *testing.T) {
+	testLL := InitLinkedList()
+	addNotestoList(testLL, 5)
+	stringReps := testLL.GetStringReprs()
+	for _, stringRep := range stringReps {
+		fmt.Println(stringRep)
+	}
 
 }
 
@@ -95,10 +222,12 @@ func checkLength(t *testing.T, list *LinkedList, wantLength int) {
 	}
 }
 
-func checkNodes(gotNode, wantNode *Node, t *testing.T) {
+func checkNodes(gotNode, wantNode *Node, t *testing.T) error {
 	got := gotNode.String()
 	want := wantNode.String()
 	if got != want {
-		t.Errorf("got %v want %v", got, want)
+		t.Errorf("\ngot \n%v \nwant \n%v", got, want)
+		return errors.New("error returned")
 	}
+	return nil
 }

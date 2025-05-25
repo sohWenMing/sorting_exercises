@@ -1,6 +1,7 @@
 package linkedlist
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -125,6 +126,55 @@ func (l *LinkedList) GetNodeWithVal(searchVal int) (node *Node, index int, isFou
 		curIndex += 1
 	}
 	return
+}
+
+func (l *LinkedList) AddNodeAtIndex(node *Node, index int) (err error) {
+	// handle cases for negative index, and out of bounds error
+	if index < 0 {
+		return errors.New("index cannot be negative")
+	}
+
+	curLength := l.GetLength()
+	if index > curLength {
+		return errors.New("index would be be out of bounds")
+	}
+
+	// if inserting at index 0, then we can just use the AddToHead method which will already handle head and tail
+	if index == 0 {
+		l.AddToHead(node)
+		return nil
+	}
+	// if inserting after last index of list, then can just use the AddToTail method which will already handle head and tail
+	if index == curLength {
+		l.AddToTail(node)
+		return nil
+	}
+
+	// if inserting at middle, will need to find the previous node to attach the new node to, and the next node to attach the new node to
+	currNode := l.GetHead()
+	var prevNode *Node
+	currIdx := 0
+
+	for currIdx < index {
+		prevNode = currNode
+		currNode = currNode.next
+		currIdx++
+	}
+
+	prevNode.next = node
+	node.next = currNode
+
+	return nil
+}
+
+func (l *LinkedList) GetStringReprs() []string {
+	returnSlice := []string{}
+	currNode := l.GetHead()
+	for currNode != nil {
+		returnSlice = append(returnSlice, currNode.String())
+		currNode = currNode.next
+	}
+	return returnSlice
 }
 
 func (l *LinkedList) GetLength() int {
