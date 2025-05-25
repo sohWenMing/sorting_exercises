@@ -63,22 +63,32 @@ func TestGetNodeAtIndex(t *testing.T) {
 		t.Errorf("isFound should have returned false but returned true")
 	}
 	// test for trying to get node at first index of empty list, should return isFound = false
-	nodes := []*Node{}
-	for i := range 5 {
-		newNode := InitNode(i)
-		nodes = append(nodes, newNode)
-		testLL.AddToTail(newNode)
-	}
-
+	nodes := addNotestoList(testLL, 5)
 	gotNode, isFound := testLL.GetNodeAtIndex(4)
 	if !isFound {
+		nodes := []*Node{}
+		for i := range 5 {
+			newNode := InitNode(i)
+			nodes = append(nodes, newNode)
+			testLL.AddToTail(newNode)
+		}
 		t.Errorf("isFound should have returned true but returned false")
 	}
 	checkNodes(gotNode, nodes[4], t)
 
 }
 
-func checkLength(t *testing.T, list LinkedList, wantLength int) {
+func addNotestoList(l *LinkedList, numNodes int) []*Node {
+	nodes := []*Node{}
+	for i := range numNodes {
+		newNode := InitNode(i)
+		nodes = append(nodes, newNode)
+		l.AddToTail(newNode)
+	}
+	return nodes
+}
+
+func checkLength(t *testing.T, list *LinkedList, wantLength int) {
 	gotLength := list.GetLength()
 	if gotLength != wantLength {
 		t.Errorf("got %v want %v", gotLength, wantLength)

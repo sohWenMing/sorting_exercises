@@ -44,8 +44,8 @@ type LinkedList struct {
 	length int
 }
 
-func InitLinkedList() LinkedList {
-	return LinkedList{
+func InitLinkedList() *LinkedList {
+	return &LinkedList{
 		nil,
 		nil,
 		0,
@@ -98,6 +98,33 @@ func (l *LinkedList) GetNodeAtIndex(searchIndex int) (node *Node, isFound bool) 
 		idx++
 	}
 	return cur, true
+}
+
+func (l *LinkedList) GetNodeWithVal(searchVal int) (node *Node, index int, isFound bool) {
+	node = nil
+	index = 0
+	isFound = false
+
+	// init negative values first
+	if l.GetLength() == 0 {
+		return
+	}
+
+	curNode := l.GetHead()
+	curIndex := 0
+	for curNode != nil {
+
+		if curNode.val == searchVal {
+			node = curNode
+			index = curIndex
+			isFound = true
+			return
+		}
+
+		curNode = curNode.next
+		curIndex += 1
+	}
+	return
 }
 
 func (l *LinkedList) GetLength() int {
